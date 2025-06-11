@@ -7,7 +7,7 @@ const ArticleList = ({ articles, loading }) => {
 
   return (
     <div className="article-list">
-      {articles?.map(article => (
+      { articles?.map(article => (
         <ArticleCard key={article.id} article={article} />
       ))}
     </div>

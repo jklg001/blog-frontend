@@ -12,10 +12,9 @@ function Home() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await articleApi.getList();
-        setArticles(res.data?.data || []); // Add proper data structure access
+        const { data } = await articleApi.getList();
+        setArticles(data.list || []); // Add proper data structure access
       } catch (error) {
-        console.log('请求失败:', error);
         setArticles([]); // Ensure fallback empty array
       } finally {
         setLoading(false);
