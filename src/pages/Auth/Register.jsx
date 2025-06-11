@@ -1,5 +1,7 @@
+/* eslint-disable no-console, no-undef */
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router'
+import { userApi } from '../../api'
 
 function Register() {
   const navigate = useNavigate()
@@ -99,27 +101,14 @@ function Register() {
     return Object.keys(errors).length === 0
   }
 
-  // API调用
+  // API调用 - 使用公共的 axios 配置
   const registerUser = async (userData) => {
-    const response = await fetch('/api/users/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        name: userData.name.trim(),
-        email: userData.email.trim(),
-        password: userData.password,
-        username: userData.username.trim()
-      }),
+    return await userApi.register({
+      name: userData.name.trim(),
+      email: userData.email.trim(),
+      password: userData.password,
+      username: userData.username.trim()
     })
-
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.message || '注册失败')
-    }
-
-    return response.json()
   }
 
   // 表单提交处理
@@ -137,6 +126,7 @@ function Register() {
     try {
       await registerUser(formData)
 
+      // 注册成功（使用公共 axios 配置，成功时直接返回 data 部分）
       setSuccess('注册成功！正在跳转到登录页面...')
 
       // 延迟跳转，让用户看到成功消息
@@ -150,7 +140,8 @@ function Register() {
       }, 2000)
 
     } catch (err) {
-      console.error('注册错误:', err)
+      // 记录注册错误（生产环境可以替换为日志服务）
+      // console.error('注册错误:', err)
       setError(err.message || '注册失败，请稍后重试')
     } finally {
       setLoading(false)

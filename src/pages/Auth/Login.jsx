@@ -1,6 +1,8 @@
+/* eslint-disable no-console */
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router'
 import { setToken, setUser, isAuthenticated } from '../../utils/auth'
+import { userApi } from '../../api'
 
 function Login() {
   const navigate = useNavigate()
@@ -84,22 +86,9 @@ function Login() {
     return Object.keys(errors).length === 0
   }
 
-  // API调用
+  // API调用 - 使用公共的 axios 配置
   const loginUser = async (credentials) => {
-    const response = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(credentials),
-    })
-    
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.message || '登录失败')
-    }
-    
-    return response.json()
+    return await userApi.login(credentials)
   }
 
   // 表单提交处理
@@ -116,8 +105,8 @@ function Login() {
     try {
       const result = await loginUser(formData)
       
-      // 存储JWT令牌
-      if (result.token) {
+      // 存储JWT令牌（result 现在是解析后的 data 部分）
+      if (result && result.token) {
         setToken(result.token)
         
         // 可选：存储用户信息
@@ -132,7 +121,8 @@ function Login() {
         setError('登录失败：未收到访问令牌')
       }
     } catch (err) {
-      console.error('登录错误:', err)
+      // 记录登录错误（生产环境可以替换为日志服务）
+      // console.error('登录错误:', err)
       setError(err.message || '登录失败，请稍后重试')
     } finally {
       setLoading(false)
