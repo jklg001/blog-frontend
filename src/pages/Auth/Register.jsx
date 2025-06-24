@@ -1,7 +1,8 @@
 /* eslint-disable no-console, no-undef */
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router'
-import { userApi } from '../../api'
+import { userApi } from '@/api'
+import { isAuthenticated } from '@/utils/auth'
 
 function Register() {
   const navigate = useNavigate()
@@ -27,8 +28,7 @@ function Register() {
 
   // 检查是否已登录，如果已登录则重定向
   useEffect(() => {
-    const token = localStorage.getItem('token')
-    if (token) {
+    if (isAuthenticated()) {
       navigate('/', { replace: true })
     }
   }, [navigate])
@@ -84,10 +84,8 @@ function Register() {
     // 密码验证
     if (!formData.password) {
       errors.password = '请输入密码'
-    } else if (formData.password.length < 8) {
-      errors.password = '密码长度至少8位'
-    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
-      errors.password = '密码必须包含大小写字母和数字'
+    } else if (formData.password.length < 6) {
+      errors.password = '密码长度至少6位'
     }
 
     // 确认密码验证
@@ -140,9 +138,12 @@ function Register() {
       }, 2000)
 
     } catch (err) {
-      // 记录注册错误（生产环境可以替换为日志服务）
-      // console.error('注册错误:', err)
-      setError(err.message || '注册失败，请稍后重试')
+      // 处理特定的错误情况
+      if (err.code === 409) {
+        setError('该邮箱或用户名已被注册');
+      } else {
+        setError(err.message || '注册失败，请稍后重试');
+      }
     } finally {
       setLoading(false)
     }
@@ -263,7 +264,7 @@ function Register() {
                     ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
                     : 'border-gray-300 focus:ring-green-500 focus:border-green-500'
                 }`}
-                placeholder="请输入密码（至少8位，包含大小写字母和数字）"
+                placeholder="请输入密码（至少6位）"
               />
               <button
                 type="button"

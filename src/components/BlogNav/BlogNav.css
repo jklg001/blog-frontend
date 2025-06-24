@@ -19,6 +19,7 @@
     height: 64px;
     display: flex;
     align-items: center;
+    justify-content: space-between;
 }
 
 .nav-left {
@@ -35,9 +36,160 @@
     font-weight: bold;
     font-size: 24px;
     margin-right: 16px;
+    color: #4B5563;
+    text-decoration: none;
 }
 
 .nav {
     cursor: pointer;
     margin-right: 24px;
+    color: #4B5563;
+    text-decoration: none;
+}
+
+.nav:hover {
+    color: #1F2937;
+    text-decoration: underline;
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+}
+
+.auth-actions, .user-actions {
+    display: flex;
+    align-items: center;
+}
+
+.login-btn, .register-btn {
+    padding: 6px 12px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 14px;
+    margin-left: 8px;
+}
+
+.login-btn {
+    color: #4B5563;
+    border: 1px solid #D1D5DB;
+}
+
+.login-btn:hover {
+    background-color: #F3F4F6;
+}
+
+.register-btn {
+    color: white;
+    background-color: #3B82F6;
+    border: 1px solid #3B82F6;
+}
+
+.register-btn:hover {
+    background-color: #2563EB;
+}
+
+.welcome-text {
+    color: #4B5563;
+    margin-right: 8px;
+    font-size: 14px;
+}
+
+.logout-btn {
+    padding: 6px 12px;
+    border-radius: 4px;
+    color: #DC2626;
+    border: 1px solid #DC2626;
+    background-color: white;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.logout-btn:hover {
+    background-color: #FEE2E2;
+}
+
+.blog-manage {
+    color: #3B82F6;
+    font-weight: 500;
+}
+
+.blog-manage:hover {
+    color: #2563EB;
+}
+
+.admin-badge {
+    display: inline-block;
+    margin-left: 5px;
+    padding: 1px 5px;
+    font-size: 12px;
+    background-color: #ff4757;
+    color: white;
+    border-radius: 3px;
+    vertical-align: middle;
+}
+
+/* 用户菜单样式 */
+.user-menu-container {
+    position: relative;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.user-info:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.dropdown-arrow {
+    font-size: 10px;
+    margin-left: 5px;
+    color: #666;
+}
+
+.user-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 150px;
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    z-index: 100;
+    margin-top: 5px;
+}
+
+.dropdown-item {
+    display: block;
+    padding: 10px 15px;
+    color: #333;
+    text-decoration: none;
+    transition: background-color 0.2s;
+}
+
+.dropdown-item:hover {
+    background-color: #f5f5f5;
+}
+
+.logout-item {
+    color: #e74c3c;
+    width: 100%;
+    text-align: left;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.dropdown-divider {
+    height: 1px;
+    background-color: #eee;
+    margin: 5px 0;
 }
