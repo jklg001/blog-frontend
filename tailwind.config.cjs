@@ -1,9 +1,13 @@
+/** @type {import('tailwindcss').Config} */
 module.exports = {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
   theme: {
-    extend: {
-      minHeight: {
-        '68px': '68px'
-      }
-    }
-  }
-}
+    extend: {},
+  },
+  plugins: [
+    require('@tailwindcss/typography'),
+  ],
+} 

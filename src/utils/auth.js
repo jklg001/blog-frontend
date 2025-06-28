@@ -6,8 +6,10 @@
  */
 export const getToken = () => {
   try {
+    // eslint-disable-next-line no-undef
     return localStorage.getItem('token')
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('获取token失败:', error)
     return null
   }
@@ -19,8 +21,10 @@ export const getToken = () => {
  */
 export const setToken = (token) => {
   try {
+    // eslint-disable-next-line no-undef
     localStorage.setItem('token', token)
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('存储token失败:', error)
   }
 }
@@ -30,9 +34,12 @@ export const setToken = (token) => {
  */
 export const removeToken = () => {
   try {
+    // eslint-disable-next-line no-undef
     localStorage.removeItem('token')
+    // eslint-disable-next-line no-undef
     localStorage.removeItem('user')
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('移除token失败:', error)
   }
 }
@@ -43,9 +50,11 @@ export const removeToken = () => {
  */
 export const getUser = () => {
   try {
+    // eslint-disable-next-line no-undef
     const userStr = localStorage.getItem('user')
     return userStr ? JSON.parse(userStr) : null
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('获取用户信息失败:', error)
     return null
   }
@@ -57,8 +66,10 @@ export const getUser = () => {
  */
 export const setUser = (user) => {
   try {
+    // eslint-disable-next-line no-undef
     localStorage.setItem('user', JSON.stringify(user))
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('存储用户信息失败:', error)
   }
 }
@@ -84,6 +95,7 @@ export const isAuthenticated = () => {
     
     return true
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('验证token失败:', error)
     removeToken()
     return false
@@ -133,6 +145,7 @@ export const authenticatedFetch = async (url, options = {}) => {
   if (response.status === 401) {
     logout()
     // 可以在这里触发重定向到登录页面
+    // eslint-disable-next-line no-undef
     window.location.href = '/login'
   }
   

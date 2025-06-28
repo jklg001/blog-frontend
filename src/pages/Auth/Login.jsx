@@ -1,22 +1,26 @@
+/* eslint-disable no-console */
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router'
-import { setToken, setUser, isAuthenticated } from '../../utils/auth'
+import { setToken, setUser, isAuthenticated } from '@/utils/auth'
+import { authApi } from '@/api/auth.api'
+import { useUser } from '@/contexts/UserContext'
 
 function Login() {
   const navigate = useNavigate()
   const location = useLocation()
-  
+  const { refreshUserInfo } = useUser()
+
   // 表单状态
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   })
-  
+
   // UI状态
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  
+
   // 表单验证状态
   const [fieldErrors, setFieldErrors] = useState({})
 
@@ -25,12 +29,12 @@ function Login() {
     if (isAuthenticated()) {
       navigate('/', { replace: true })
     }
-    
-    // 检查是否有来自注册页面的消息  
+
+    // 检查是否有来自注册页面的消息
     if (location.state?.message) {
       setError('')  // 清除错误，显示成功消息
     }
-    
+
     // 如果有预填的邮箱，自动填入
     if (location.state?.email) {
       setFormData(prev => ({
@@ -47,7 +51,7 @@ function Login() {
       ...prev,
       [name]: value
     }))
-    
+
     // 清除对应字段的错误
     if (fieldErrors[name]) {
       setFieldErrors(prev => ({
@@ -55,7 +59,7 @@ function Login() {
         [name]: ''
       }))
     }
-    
+
     // 清除全局错误
     if (error) {
       setError('')
@@ -65,66 +69,56 @@ function Login() {
   // 表单验证
   const validateForm = () => {
     const errors = {}
-    
+
     // 邮箱验证
     if (!formData.email) {
       errors.email = '请输入邮箱地址'
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       errors.email = '请输入有效的邮箱地址'
     }
-    
+
     // 密码验证
     if (!formData.password) {
       errors.password = '请输入密码'
     } else if (formData.password.length < 6) {
       errors.password = '密码长度至少6位'
     }
-    
+
     setFieldErrors(errors)
     return Object.keys(errors).length === 0
   }
 
-  // API调用
+  // API调用 - 使用公共的 axios 配置
   const loginUser = async (credentials) => {
-    const response = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(credentials),
-    })
-    
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.message || '登录失败')
-    }
-    
-    return response.json()
+    return await authApi.login(credentials)
   }
 
   // 表单提交处理
   const handleSubmit = async (e) => {
     e.preventDefault()
-    
+
     if (!validateForm()) {
       return
     }
-    
+
     setLoading(true)
     setError('')
-    
+
     try {
       const result = await loginUser(formData)
-      
-      // 存储JWT令牌
-      if (result.token) {
-        setToken(result.token)
-        
-        // 可选：存储用户信息
+
+      // 根据Swagger文档，登录成功返回的数据结构是 { access_token, user, expires_in }
+      if (result && result.access_token) {
+        setToken(result.access_token)
+
+        // 存储用户信息
         if (result.user) {
           setUser(result.user)
         }
-        
+
+        // 刷新用户信息
+        await refreshUserInfo()
+
         // 重定向到目标页面或首页
         const from = location.state?.from?.pathname || '/'
         navigate(from, { replace: true })
@@ -132,7 +126,8 @@ function Login() {
         setError('登录失败：未收到访问令牌')
       }
     } catch (err) {
-      console.error('登录错误:', err)
+      // 记录登录错误（生产环境可以替换为日志服务）
+      // console.error('登录错误:', err)
       setError(err.message || '登录失败，请稍后重试')
     } finally {
       setLoading(false)
@@ -150,19 +145,19 @@ function Login() {
             请登录您的账户
           </p>
         </div>
-        
+
         {location.state?.message && (
           <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
             <p className="text-green-700 text-sm">{location.state.message}</p>
           </div>
         )}
-        
+
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
             <p className="text-red-700 text-sm">{error}</p>
           </div>
         )}
-        
+
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
@@ -187,7 +182,7 @@ function Login() {
               <p className="mt-1 text-sm text-red-600">{fieldErrors.email}</p>
             )}
           </div>
-          
+
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
               密码 *
@@ -241,7 +236,7 @@ function Login() {
               <p className="mt-1 text-sm text-red-600">{fieldErrors.password}</p>
             )}
           </div>
-          
+
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <input
@@ -254,14 +249,14 @@ function Login() {
                 记住我
               </label>
             </div>
-            
+
             <div className="text-sm">
               <a href="#" className="text-blue-600 hover:text-blue-500 transition-colors">
                 忘记密码？
               </a>
             </div>
           </div>
-          
+
           <button
             type="submit"
             disabled={loading}
@@ -284,7 +279,7 @@ function Login() {
             )}
           </button>
         </form>
-        
+
         <div className="mt-8">
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
@@ -294,22 +289,22 @@ function Login() {
               <span className="px-2 bg-white text-gray-500">或</span>
             </div>
           </div>
-          
+
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               还没有账号？
-              <Link 
-                to="/register" 
+              <Link
+                to="/register"
                 className="text-blue-600 hover:text-blue-500 font-medium ml-1 transition-colors"
               >
                 立即注册
               </Link>
             </p>
           </div>
-          
+
           <div className="mt-4 text-center">
-            <Link 
-              to="/" 
+            <Link
+              to="/"
               className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
             >
               ← 返回首页
@@ -321,4 +316,4 @@ function Login() {
   )
 }
 
-export default Login 
+export default Login
